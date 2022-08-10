@@ -72,6 +72,9 @@ contract AddressList {
     function initialize(address _admin) external onlyNotInitialized {
         admin = _admin;
         initialized = true;
+
+        // we need merge v2 to our initial version
+        _initializeV2();
     }
 
     function enableDevVerify() external onlyAdmin {
@@ -195,8 +198,7 @@ contract AddressList {
     }
 
     // rules manage
-
-    function initializeV2() external {
+    function _initializeV2() internal {
         require(rulesLastUpdatedNumber == 0, "Only initialize before any use");
         require(blackLastUpdatedNumber == 0, "Only initialize before any use");
         // erc20/erc721 transfer: Transfer(address,address,uint256);

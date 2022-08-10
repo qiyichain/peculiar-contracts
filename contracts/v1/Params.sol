@@ -8,8 +8,8 @@ contract Params {
     bool public initialized;
 
     // System contracts
-    IValidators public constant validatorsContract = IValidators(0x000000000000000000000000000000000000F005);
-    IPunish public constant punishContract = IPunish(0x000000000000000000000000000000000000F006);
+    IValidators public constant validatorsContract = IValidators(0x000000000000000000000000000000000000f000);
+    IPunish public constant punishContract = IPunish(0x000000000000000000000000000000000000F001);
 
     // System params
     uint16 public constant MaxValidators = 21;

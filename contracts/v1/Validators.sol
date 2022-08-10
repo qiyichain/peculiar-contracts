@@ -39,15 +39,12 @@ contract Validators is Params, SafeSend, IValidators {
     uint public foundationRate;
 
 
-    // bool public canWithdrawRewards; // disable rewards withdraw at first period.
-
     event ChangeAdmin(address indexed admin);
     event UpdateParams(uint8 posCount, uint8 posBackup, uint8 poaCount, uint8 poaBackup);
     event AddValidator(address indexed validator, address votePool);
     event UpdateRates(uint burnRate, uint foundationRate);
     event UpdateFoundationAddress(address foundation);
     event WithdrawFoundationReward(address receiver, uint amount);
-    // event CanWithdrawRewardsStateChanged(bool indexed newState);
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "Only admin");
@@ -78,7 +75,8 @@ contract Validators is Params, SafeSend, IValidators {
 
         initialized = true;
         admin = _admin;
-        // canWithdrawRewards = false; // disable rewards withdraw
+        burnRate = 0; // no burn 
+        foundationRate = 0; // no rewards to fundation
 
         count[ValidatorType.Pos] = 0;
         count[ValidatorType.Poa] = 21;
@@ -282,41 +280,13 @@ contract Validators is Params, SafeSend, IValidators {
 
         uint _left = msg.value.add(rewardLeft).sub(burnVal).sub(foundationVal);
 
-        // 10% to backups; 40% to validators according to votes; 50% is divided equally among validators
-        uint _firstPart = _left.mul(10).div(100);
-        uint _secondPartTotal = _left.mul(40).div(100);
-        uint _thirdPart = _left.mul(50).div(100);
-
-        if (backupValidators.length > 0) {
-            uint _totalBackupVote = 0;
-            for (uint8 i = 0; i < backupValidators.length; i++) {
-                _totalBackupVote = _totalBackupVote.add(votePools[backupValidators[i]].totalVote());
-            }
-
-            if (_totalBackupVote > 0) {
-                for (uint8 i = 0; i < backupValidators.length; i++) {
-                    IVotePool _pool = votePools[backupValidators[i]];
-                    uint256 _reward = _firstPart.mul(_pool.totalVote()).div(_totalBackupVote);
-                    pendingReward[_pool] = pendingReward[_pool].add(_reward);
-                    _left = _left.sub(_reward);
-                }
-            }
-        }
-
+        // NOTE: We don't need vote and backups validators, 
+        //  so we distribute all rewards to validators.
+        uint _thirdPart = _left;
         if (activeValidators.length > 0) {
-            uint _totalVote = 0;
-            for (uint8 i = 0; i < activeValidators.length; i++) {
-                _totalVote = _totalVote.add(votePools[activeValidators[i]].totalVote());
-            }
-
             for (uint8 i = 0; i < activeValidators.length; i++) {
                 IVotePool _pool = votePools[activeValidators[i]];
                 uint _reward = _thirdPart.div(activeValidators.length);
-                if (_totalVote > 0) {
-                    uint _secondPart = _pool.totalVote().mul(_secondPartTotal).div(_totalVote);
-                    _reward = _reward.add(_secondPart);
-                }
-
                 pendingReward[_pool] = pendingReward[_pool].add(_reward);
                 _left = _left.sub(_reward);
             }
@@ -326,8 +296,8 @@ contract Validators is Params, SafeSend, IValidators {
     }
 
     // NOTE: Validators couldn't withdraw rewards to its account directly, 
-    //       it must by manager call VotePool's `withdrawValidatorReward` function. 
-    //       So we don't need change any codes at here.
+    // it must by manager call VotePool's `withdrawValidatorReward` function. 
+    // So we don't need change any codes at here.
     function withdrawReward()
     override
     external {
