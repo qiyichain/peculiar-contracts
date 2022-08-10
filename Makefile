@@ -1,12 +1,11 @@
-all:
-	yarn
+all: compile
 
 .PHONY:compile
 compile: clean
 	yarn compile
 
 .PHONY:test
-test:
+test:clean
 	yarn test
 
 .PHONY:clean

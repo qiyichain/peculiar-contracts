@@ -1,10 +1,8 @@
+//SPDX-License-Identifier: MIT
+
 pragma solidity >=0.6.0 <0.8.0;
 
-// #if Mainnet
 import "./Params.sol";
-// #else
-import "./mock/MockParams.sol";
-// #endif
 import "./interfaces/IVotePool.sol";
 import "./interfaces/IValidators.sol";
 import "./interfaces/IPunish.sol";

@@ -7,13 +7,13 @@ const prodConfig = {
     Mainnet: true,
 }
 
-const devConfig = {
-    Mainnet: false,
-}
+// const devConfig = {
+//     Mainnet: false,
+// }
 
 const contractDefs = {
     mainnet: prodConfig,
-    devnet: devConfig
+    // devnet: devConfig
 }
 
 module.exports = {
