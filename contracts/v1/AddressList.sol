@@ -73,8 +73,38 @@ contract AddressList {
         admin = _admin;
         initialized = true;
 
+        // rules manage
         // we need merge v2 to our initial version
-        _initializeV2();
+        require(rulesLastUpdatedNumber == 0, "Only initialize before any use");
+        require(blackLastUpdatedNumber == 0, "Only initialize before any use");
+        // erc20/erc721 transfer: Transfer(address,address,uint256);
+        bytes32 sig = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
+        uint128 checkIdx = 1;
+        EventCheckRule memory rule = EventCheckRule(sig, checkIdx, CheckType.CheckFrom);
+        rules.push(rule);
+        rulesMap[sig][checkIdx] = rules.length;
+
+        // erc777 sent: Sent(address,address,address,uint256,bytes,bytes)
+        sig = 0x06b541ddaa720db2b10a4d0cdac39b8d360425fc073085fac19bc82614677987;
+        checkIdx = 2;
+        rule = EventCheckRule(sig, checkIdx, CheckType.CheckFrom);
+        rules.push(rule);
+        rulesMap[sig][checkIdx] = rules.length;
+
+        // erc1155 transfer single and batch
+        // TransferSingle(address,address,address,uint256,uint256)
+        sig = 0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62;
+        rule = EventCheckRule(sig, checkIdx, CheckType.CheckFrom);
+        rules.push(rule);
+        rulesMap[sig][checkIdx] = rules.length;
+        // TransferBatch(address,address,address,uint256[],uint256[])
+        sig = 0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb;
+        rule = EventCheckRule(sig, checkIdx, CheckType.CheckFrom);
+        rules.push(rule);
+        rulesMap[sig][checkIdx] = rules.length;
+
+        blackLastUpdatedNumber = block.number;
+        rulesLastUpdatedNumber = block.number;
     }
 
     function enableDevVerify() external onlyAdmin {
@@ -197,39 +227,7 @@ contract AddressList {
         emit BlackAddrRemoved(a, d);
     }
 
-    // rules manage
-    function _initializeV2() internal {
-        require(rulesLastUpdatedNumber == 0, "Only initialize before any use");
-        require(blackLastUpdatedNumber == 0, "Only initialize before any use");
-        // erc20/erc721 transfer: Transfer(address,address,uint256);
-        bytes32 sig = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
-        uint128 checkIdx = 1;
-        EventCheckRule memory rule = EventCheckRule(sig, checkIdx, CheckType.CheckFrom);
-        rules.push(rule);
-        rulesMap[sig][checkIdx] = rules.length;
-
-        // erc777 sent: Sent(address,address,address,uint256,bytes,bytes)
-        sig = 0x06b541ddaa720db2b10a4d0cdac39b8d360425fc073085fac19bc82614677987;
-        checkIdx = 2;
-        rule = EventCheckRule(sig, checkIdx, CheckType.CheckFrom);
-        rules.push(rule);
-        rulesMap[sig][checkIdx] = rules.length;
-
-        // erc1155 transfer single and batch
-        // TransferSingle(address,address,address,uint256,uint256)
-        sig = 0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62;
-        rule = EventCheckRule(sig, checkIdx, CheckType.CheckFrom);
-        rules.push(rule);
-        rulesMap[sig][checkIdx] = rules.length;
-        // TransferBatch(address,address,address,uint256[],uint256[])
-        sig = 0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb;
-        rule = EventCheckRule(sig, checkIdx, CheckType.CheckFrom);
-        rules.push(rule);
-        rulesMap[sig][checkIdx] = rules.length;
-
-        blackLastUpdatedNumber = block.number;
-        rulesLastUpdatedNumber = block.number;
-    }
+   
 
     function addOrUpdateRule(bytes32 sig, uint128 checkIdx, CheckType tp) external onlyAdmin returns (bool) {
         require(sig != bytes32(0), "eventSignature must not empty");

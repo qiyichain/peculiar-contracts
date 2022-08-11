@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.0 <0.8.0;
 
+// #if Mainnet
 import "./Params.sol";
+// #else
+import "./mock/MockParams.sol";
+// #endif
 import "./library/SafeMath.sol";
 import "./library/ReentrancyGuard.sol";
 import "./library/SafeSend.sol";
@@ -93,7 +97,9 @@ contract VotePool is Params, ReentrancyGuard, SafeSend, IVotePool {
 
     constructor(address _validator, address _manager, uint _percent, ValidatorType _type, State _state) 
     public
+        // #if Mainnet
     onlyValidatorsContract
+        // #endif
     onlyValidAddress(_validator)
     onlyValidAddress(_manager)
     onlyValidPercent(_type, _percent) {
