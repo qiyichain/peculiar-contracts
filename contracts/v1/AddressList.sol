@@ -2,7 +2,7 @@
 
 pragma solidity >= 0.6.0 < 0.8.0;
 
-// AddressList manages the developer addresses and black-list addresses
+// AddressList manages the developer(B-End) addresses and black-list addresses
 // NOTE: Never change the sequence of storage variables.
 contract AddressList {
     bool public initialized;
