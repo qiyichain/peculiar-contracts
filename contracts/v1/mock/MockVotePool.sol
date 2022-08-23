@@ -6,7 +6,7 @@ import "../Params.sol";
 // #else
 import "./MockParams.sol";
 // #endif
-import "../../library/SafeMath.sol";
+import "../library/SafeMath.sol";
 import "../interfaces/IVotePool.sol";
 import "../interfaces/IValidators.sol";
 

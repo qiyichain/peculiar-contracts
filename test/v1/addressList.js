@@ -44,10 +44,11 @@ describe("AddressList contract", function () {
     describe("manage rules", async function () {
 
         it('should only initialize rules before any use',async function () {
-            let receipt = await aList.initializeV2();
-            assert.equal(receipt.receipt.status, true);
-
-            await expectRevert( aList.initializeV2(),"Only initialize before any use");
+            // NOTE: we initialize rules in initialize()
+            //
+            // let receipt = await aList.initializeV2();
+            // assert.equal(receipt.receipt.status, true);
+            // await expectRevert( aList.initializeV2(),"Only initialize before any use");
 
             //remove all rules for later test
             await aList.removeRule(erc1155transBatchRule.sig, erc1155transBatchRule.idx, {from: admin});

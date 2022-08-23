@@ -183,9 +183,10 @@ contract("Validators test", accounts => {
             {addr: accounts[4], type: Poa, vote: 400, reward: '140993788819875775'}, //validator
             {addr: accounts[5], type: Poa, vote: 300, reward: '123602484472049688'}, //validator
             {addr: accounts[6], type: Poa, vote: 200, reward: '106211180124223601'}, //validator
-            {addr: accounts[7], type: Poa, vote: 200, reward: '57142857142857142'}, // backup
-            {addr: accounts[8], type: Poa, vote: 150, reward: '42857142857142857'}, // backup
-            {addr: accounts[9], type: Poa, vote: 100, reward: '0'}, // none
+            // we don't need backup 
+            // {addr: accounts[7], type: Poa, vote: 200, reward: '57142857142857142'}, // backup
+            // {addr: accounts[8], type: Poa, vote: 150, reward: '42857142857142857'}, // backup
+            // {addr: accounts[9], type: Poa, vote: 100, reward: '0'}, // none
         ]
 
         validators = await Validators.new()
@@ -217,9 +218,13 @@ contract("Validators test", accounts => {
             gas: 4000000,
             value: reward
         })
+
+        // All validators should get euqal rewards.
+        let p = await validators.votePools(pos[0].addr)
+        rewards = (await validators.pendingReward(p)).toString()
         for (const it of pos.concat(poa)) {
             let pool = await validators.votePools(it.addr)
-            assert.equal(it.reward, (await validators.pendingReward(pool)).toString())
+            assert.equal(rewards, (await validators.pendingReward(pool)).toString())
         }
     })
 });

@@ -1,3 +1,5 @@
+//SPDX-License-Identifier: MIT
+
 pragma solidity >=0.6.0 <0.8.0;
 
 // #if Mainnet
@@ -12,6 +14,7 @@ contract MockPunish is Params {
     // clean validator's punish record if one restake in
     function cleanPunishRecord(address)
     external
+    view
     onlyInitialized
     returns (bool)
     {
