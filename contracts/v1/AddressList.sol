@@ -72,8 +72,8 @@ contract AddressList {
     function initialize(address _admin) external onlyNotInitialized {
         admin = _admin;
         initialized = true;
+        devVerifyEnabled = true;
 
-        // rules manage
         // we need merge v2 to our initial version
         require(rulesLastUpdatedNumber == 0, "Only initialize before any use");
         require(blackLastUpdatedNumber == 0, "Only initialize before any use");
