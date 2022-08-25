@@ -1,4 +1,4 @@
-# heco-contracts
+# peculiar-contracts
 
 ## Prepare
 
