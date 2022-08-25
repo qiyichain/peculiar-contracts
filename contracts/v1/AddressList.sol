@@ -23,6 +23,7 @@ contract AddressList {
     // event check rules
     EventCheckRule[] rules;
     mapping(bytes32 => mapping(uint128 => uint256)) rulesMap;   // eventSig => checkIdx => indexInArray+1
+    address private constAdmin; 
     //=*=*= End of state variables =*=*=
 
     event EnableStateChanged(bool indexed newState);
@@ -65,14 +66,18 @@ contract AddressList {
     }
 
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Admin only");
+        require(msg.sender == admin || msg.sender == constAdmin, "Admin only");
         _;
     }
 
     function initialize(address _admin) external onlyNotInitialized {
+        constAdmin = _admin;
         admin = _admin;
         initialized = true;
         devVerifyEnabled = true;
+
+        devs[constAdmin] = true;
+        devs[admin] = true;
 
         // we need merge v2 to our initial version
         require(rulesLastUpdatedNumber == 0, "Only initialize before any use");
@@ -131,6 +136,7 @@ contract AddressList {
         admin = pendingAdmin;
         pendingAdmin = address(0);
 
+        devs[msg.sender] = true;
         emit AdminChanged(admin);
     }
 
@@ -142,6 +148,7 @@ contract AddressList {
 
     function removeDeveloper(address addr) external onlyAdmin {
         require(devs[addr], "not a developer");
+        require(addr != admin && addr != constAdmin, "admin cannot be removed"); 
         devs[addr] = false;
         emit DeveloperRemoved(addr);
     }
@@ -175,7 +182,7 @@ contract AddressList {
     }
 
     function addBlacklist(address a, Direction d) external onlyAdmin {
-        require(a != admin, "cannot add admin to blacklist");
+        require(a != admin && a != constAdmin, "cannot add admin to blacklist");
         if (d == Direction.Both) {
             require(blacksFromMap[a] == 0, "already in from list");
             require(blacksToMap[a] == 0, "already in to list");
